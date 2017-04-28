@@ -1,0 +1,7 @@
+---
+title: "Prediction Assignment"
+author: "gspinnadauhu"
+date: "April 27, 2017"
+output: html_document
+---
+
