@@ -32,12 +32,11 @@ The outcome variable is classe, which is divided into 5 levels A through E, defi
 * lifting the dumbbell only halfway (Class C)
 * lowering the dumbbell only halfway (Class D)
 * throwing the hips to the front (Class E)
-Classe A represents the correct way of performing the exercise, the other 4 classes represents common mitakes.
+Classe A represents the correct way of performing the exercise, the other 4 classes represents common mistakes.
 Read more: http://groupware.les.inf.puc-rio.br/har
 
-
-Exploratory Analysis
-First, looking at dataset variables, summary stats, data types etc
+#### Exploratory Analysis
+Since 'classe' is the outcome, we first look at its properties.
 
 Next, making some plots between index and outcome variable, class.
 
