@@ -4,4 +4,41 @@ author: "gspinnadauhu"
 date: "April 27, 2017"
 output: html_document
 ---
+#### Data
+Loading training and test sets.
+```{r warning=FALSE}
+trainURL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testURL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+if(!file.exists("data")){
+  dir.create("data")
+}
+download.file(trainURL,destfile="./data/train.csv")
+train<-read.csv("./data/train.csv")
+download.file(testURL,destfile="./data/test.csv")
+test<-read.csv("./data/test.csv")
+```
 
+Loading all packages needed for analysis.
+```{r warning=FALSE}
+pkgs<-c("ggplot2","car","caret","lmtest","AppliedPredictiveModeling","plyr","dplyr","ElemStatLearn","forecast","gridExtra","lubridate","magrittr","pander")
+for (i in 1:length(pkgs)){
+        library(pkgs[i],character.only = TRUE)
+}
+```
+
+The outcome variable is classe, which is divided into 5 levels A through E, defined as:
+* exactly according to the specification (Class A)
+* throwing the elbows to the front (Class B)
+* lifting the dumbbell only halfway (Class C)
+* lowering the dumbbell only halfway (Class D)
+* throwing the hips to the front (Class E)
+Classe A represents the correct way of performing the exercise, the other 4 classes represents common mitakes.
+Read more: http://groupware.les.inf.puc-rio.br/har
+
+
+Exploratory Analysis
+First, looking at dataset variables, summary stats, data types etc
+
+Next, making some plots between index and outcome variable, class.
+
+First 
