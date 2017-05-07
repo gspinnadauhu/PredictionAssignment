@@ -7,29 +7,40 @@ output: html_document
 #### Data
 Loading all packages needed for analysis.
 ```{r warning=FALSE, verbose=FALSE, message=FALSE}
-pkgs<-c("ggplot2","car","caret","lmtest","AppliedPredictiveModeling","plyr","dplyr","ElemStatLearn","forecast","gridExtra","lubridate","magrittr","pander")
+pkgs<-c("ggplot2","car","caret","lmtest","AppliedPredictiveModeling","plyr","dplyr","ElemStatLearn","forecast","gridExtra","lubridate","magrittr","pander","corrplot","ISLR","parallel")
 for (i in 1:length(pkgs)){
         library(pkgs[i],character.only = TRUE)
 }
 ```
 
 Loading training and quiz sets.
-```{r warning=FALSE, verbose=FALSE}
+```{r warning=FALSE, verbose=FALSE, message=FALSE}
 trainURL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
 testURL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 if(!file.exists("data")){
   dir.create("data")
 }
 download.file(trainURL,destfile="./data/train.csv")
-unsplit<-read.csv("./data/train.csv")
+unsplit<-read.csv("./data/train.csv",na.strings=c("","NA"))
 download.file(testURL,destfile="./data/test.csv")
-quiz<-read.csv("./data/test.csv")
+quiz<-read.csv("./data/test.csv",na.strings=c("","NA"))
 ```
+
+The outcome variable is classe, which is divided into 5 levels A through E, defined as:
+* exactly according to the specification (Class A)
+* throwing the elbows to the front (Class B)
+* lifting the dumbbell only halfway (Class C)
+* lowering the dumbbell only halfway (Class D)
+* throwing the hips to the front (Class E)
+Classe A represents the correct way of performing the exercise, the other 4 classes represents common mistakes.
+Read more: http://groupware.les.inf.puc-rio.br/har
+
 
 Splitting the training set into a test and train set, as the test set will be used for the quiz portion of the assignment.
 ```{r}
+set.seed(55442)
 #creating data partition
-inTrain<-createDataPartition(y=train$classe,p=.7,list=FALSE)
+inTrain<-createDataPartition(y=unsplit$classe,times=1,p=.7,list=FALSE)
 #splitting into train and test sets
 train<-unsplit[inTrain,]
 test<-unsplit[-inTrain,]
@@ -50,8 +61,27 @@ Some basics about the training set.
 str(train)
 ```
 
-Since 'classe' is the outcome, we first look at its properties.
+Going to remove variables that are not likely related to outcome, like user_name, timestamps, etc.
+```{r}
+train.reduced<-train[,-c(1,2,3,4,5,6,7)]
+test.reduced<-test[,-c(1,2,3,4,5,6,7)]
+```
 
-Next, making some plots between index and outcome variable, class.
+Checking the amount of missing data and if the missing data are random or not random.
+```{r}
+missingpcts<-train.reduced %>% 
+   summarise_each(funs(100*mean(is.na(.))))
+```
 
-First 
+All variables which are missing data are missing the same % of data, which could mean that for most execercises we are not getting any readings from these sensors, so we exclude these variables, since they could otherwise skew results.
+```{r}
+train.final<-train.reduced[,missingpcts<.8]
+test.final<-test.reduced[,missingpcts<.8]
+```
+
+
+Plotting predictors.
+```{r}
+featurePlot(x=train.final,y=train.final$classe,plot="pairs")
+```
+
