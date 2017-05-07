@@ -79,9 +79,15 @@ train.final<-train.reduced[,missingpcts<.8]
 test.final<-test.reduced[,missingpcts<.8]
 ```
 
-
-Plotting predictors.
+Plotting correllation amongst predictors.
 ```{r}
-featurePlot(x=train.final,y=train.final$classe,plot="pairs")
+corrplot(cor(train.final[,-53]),method="color")
 ```
 
+There appear to be some clusters with highly correllated variables. Some of them seem to be from similar sensors, i.e. dumbell, forearm etc.
+Going to use principal components analysis to reduce set of variable to lower number of less correllated variables in train and test set.
+```{r}
+pca_train<-preProcess(train.final[,-53], method="pca")
+train.transformed<-predict(pca_train,newdata=train.final[,-53])
+test.trainsformed<-predict(pca_train,newdata=test.final[,-53])
+```
