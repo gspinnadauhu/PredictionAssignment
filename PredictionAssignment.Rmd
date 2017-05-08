@@ -116,6 +116,7 @@ quiz.reduced<-quiz[,-c(1,2,3,4,5,6,7)]
 quiz.final<-quiz.reduced[,missingpcts<.8]
 quiz.transformed<-predict(pca_train,newdata=quiz.final)
 ```
+
 Now, creating the predictions.
 ```{r}
 pred.quiz<-predict(rand.forest,quiz.transformed)
