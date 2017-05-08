@@ -7,7 +7,7 @@ output: html_document
 #### Data
 Loading all packages needed for analysis.
 ```{r warning=FALSE, verbose=FALSE, message=FALSE}
-pkgs<-c("ggplot2","car","caret","lmtest","AppliedPredictiveModeling","plyr","dplyr","ElemStatLearn","forecast","gridExtra","lubridate","magrittr","pander","corrplot","ISLR","parallel")
+pkgs<-c("ggplot2","car","caret","lmtest","AppliedPredictiveModeling","plyr","dplyr","ElemStatLearn","forecast","gridExtra","lubridate","magrittr","pander","corrplot","ISLR","parallel","e1071","randomForest")
 for (i in 1:length(pkgs)){
         library(pkgs[i],character.only = TRUE)
 }
@@ -55,7 +55,7 @@ The outcome variable is classe, which is divided into 5 levels A through E, defi
 Classe A represents the correct way of performing the exercise, the other 4 classes represents common mistakes.
 Read more: http://groupware.les.inf.puc-rio.br/har
 
-#### Exploratory Analysis
+#### Preproccessing
 Some basics about the training set.
 ```{r}
 str(train)
@@ -90,4 +90,34 @@ Going to use principal components analysis to reduce set of variable to lower nu
 pca_train<-preProcess(train.final[,-53], method="pca")
 train.transformed<-predict(pca_train,newdata=train.final[,-53])
 test.trainsformed<-predict(pca_train,newdata=test.final[,-53])
+```
+
+#### Model
+Since the outcome variable is a 5-level factor, we will use a **Random Forest** prediction model.
+```{r}
+set.seed(33222)
+rand.forest<-train(y=train.final$classe,x=train.transformed,method="rf",ntree=50,tuneLength=1)
+rand.forest
+```
+
+#### Prediction
+Using our rf-model on the test.transformed set and looking at the confusion matrix.
+```{r}
+pred.rf<-predict(rand.forest,test.trainsformed)
+confusionMatrix(test.final$classe,pred.rf)
+```
+
+The model accuracy is 97.23% and the out of sample error is therefor 2.77%.
+
+#### Quiz Prediction
+First, performing the same pre-processing on the quiz set as on the train/test sets.
+```{r}
+quiz.reduced<-quiz[,-c(1,2,3,4,5,6,7)]
+quiz.final<-quiz.reduced[,missingpcts<.8]
+quiz.transformed<-predict(pca_train,newdata=quiz.final)
+```
+Now, creating the predictions.
+```{r}
+pred.quiz<-predict(rand.forest,quiz.transformed)
+pred.quiz
 ```
